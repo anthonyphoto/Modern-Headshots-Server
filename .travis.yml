@@ -1,0 +1,11 @@
+language: node_js
+node_js: node
+services:
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: fH7eyTYsGXCFOxHz67ITygZ7Riyuj4S1DL8AOOL1vsGJXLq6HD5p3CvCeawQefMOf7Z8tbwLlivrmO4iYsfrKanpVwzmB0xW4GROoKMWA54c2BrOVjlKL+9PD2VVYda06HCB1rcF+5GxlmdB8i+wctoIKiaTLI1aFmPNXqISWl0iezRHIPYOM7u4pwzLMtampJpLw90If6uKtGpYvjTZPDu6FFwrXlKUS9ig77bUXrk3Mh/d0A1w0ffaEPRrXSltOC+Bti9joxWcWBPfGOsps7GeV8sLtXgT+3LsT/M3TnasUqcWSA4SfxwPNXZ2VTMwvacuAE8mNXlm990fHUE2aYvPEs/h7bOogE1f198g/4R6829Ew6OI6PWdRusFALz3Ne/MgFq4IpVtPWSEEObjpWVX2mKa3hKEVMHy8ESkbDMwBQsb1fNgpkyGCnCb8UPk40xoGJ0PqfrhAxf5PKsAJBJ4LHBbqZY5P7LkGyHQso8q7EmQLlJ2+tUZm/m85PkHeq/b8FJde8UULu++qVodfLtYgchBFSTA0niXOKvK1ol+4RdEofwSwOPYhJvwIDKkK+LnmoZWAV2uoG2TLavHt5B1DG0IBqEgFR7hIuHF5VuWjHpDv1LUXE7vpBaqFJRPDdM5HLbFv1BSrRSe0dx7lsFV5WAqIB+L5+DXW4vXFpg=
+  app: applicant-track
+  on:
+    repo: anthonyphoto/Applicant-Tracker
