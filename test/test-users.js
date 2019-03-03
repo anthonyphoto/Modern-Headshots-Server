@@ -20,7 +20,6 @@ describe('/api/user', function () {
   const firstName = 'Example';
   const lastName = 'User';
   const admin = false;
-  const recruiter = false;
   const usernameB = 'exampleUserB';
   const passwordB = 'examplePassB';
   const firstNameB = 'ExampleB';
@@ -74,8 +73,7 @@ describe('/api/user', function () {
             username,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -101,8 +99,7 @@ describe('/api/user', function () {
             password,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -130,8 +127,7 @@ describe('/api/user', function () {
             password: 1234,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -159,8 +155,7 @@ describe('/api/user', function () {
             password,
             firstName: 1234,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -188,8 +183,7 @@ describe('/api/user', function () {
             password,
             firstName,
             lastName: 1234,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -217,8 +211,7 @@ describe('/api/user', function () {
             password,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -246,8 +239,7 @@ describe('/api/user', function () {
             password: ` ${password} `,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -275,8 +267,7 @@ describe('/api/user', function () {
             password,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -304,8 +295,7 @@ describe('/api/user', function () {
             password: '1234',
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -333,8 +323,7 @@ describe('/api/user', function () {
             password: new Array(73).fill('a').join(''),
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(() =>
             expect.fail(null, null, 'Request should not succeed')
@@ -360,8 +349,7 @@ describe('/api/user', function () {
           password,
           firstName,
           lastName,
-          admin,
-          recruiter
+          admin
         })
           .then(() =>
             // Try to create a second user with the same username
@@ -370,8 +358,7 @@ describe('/api/user', function () {
               password,
               firstName,
               lastName,
-              admin,
-              recruiter
+              admin
             })
           )
           .then(() =>
@@ -400,8 +387,7 @@ describe('/api/user', function () {
             password,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           })
           .then(res => {
             expect(res).to.have.status(201);
@@ -410,8 +396,8 @@ describe('/api/user', function () {
               'username',
               'firstName',
               'lastName',
-              'admin',
-              'recruiter'
+              'phone',
+              'admin'
             );
             expect(res.body.username).to.equal(username);
             expect(res.body.firstName).to.equal(firstName);
@@ -439,8 +425,7 @@ describe('/api/user', function () {
             password,
             firstName: ` ${firstName} `,
             lastName: ` ${lastName} `,
-            admin,
-            recruiter
+            admin
           })
           .then(res => {
             expect(res).to.have.status(201);
@@ -449,8 +434,8 @@ describe('/api/user', function () {
               'username',
               'firstName',
               'lastName',
-              'admin',
-              'recruiter'
+              'phone',
+              'admin'
             );
             expect(res.body.username).to.equal(username);
             expect(res.body.firstName).to.equal(firstName);
@@ -482,16 +467,14 @@ describe('/api/user', function () {
             password,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           },
           {
             username: usernameB,
             password: passwordB,
             firstName: firstNameB,
             lastName: lastNameB,
-            admin,
-            recruiter
+            admin
           }
         )
           .then(() => chai.request(app).get('/api/users'))
@@ -503,15 +486,15 @@ describe('/api/user', function () {
               username,
               firstName,
               lastName,
-              admin,
-              recruiter
+              phone: "",
+              admin
             });
             expect(res.body[1]).to.deep.equal({
               username: usernameB,
               firstName: firstNameB,
               lastName: lastNameB,
-              admin,
-              recruiter
+              phone: "",
+              admin
             });
           });
       });

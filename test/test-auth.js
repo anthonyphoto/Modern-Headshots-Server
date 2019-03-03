@@ -21,7 +21,6 @@ describe('Auth endpoints', function () {
   const firstName = 'Example';
   const lastName = 'User';
   const admin = false;
-  const recruiter = false;
 
   before(function () {
     return runServer(TEST_DATABASE_URL);
@@ -38,8 +37,7 @@ describe('Auth endpoints', function () {
         password,
         firstName,
         lastName,
-        admin,
-        recruiter
+        admin
       })
     );
   });
@@ -117,8 +115,8 @@ describe('Auth endpoints', function () {
             username,
             firstName,
             lastName,
-            admin,
-            recruiter
+            phone: "",
+            admin
           });
         });
     });
@@ -147,8 +145,7 @@ describe('Auth endpoints', function () {
           username,
           firstName,
           lastName,
-          admin,
-          recruiter
+          admin
         },
         'wrongSecret',
         {
@@ -180,8 +177,7 @@ describe('Auth endpoints', function () {
             username,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           },
           exp: Math.floor(Date.now() / 1000) - 10 // Expired ten seconds ago
         },
@@ -215,8 +211,7 @@ describe('Auth endpoints', function () {
             username,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           }
         },
         JWT_SECRET,
@@ -244,8 +239,7 @@ describe('Auth endpoints', function () {
             username,
             firstName,
             lastName,
-            admin,
-            recruiter
+            admin
           });
           expect(payload.exp).to.be.at.least(decoded.exp);
         });
