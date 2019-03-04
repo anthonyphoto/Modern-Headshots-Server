@@ -8,6 +8,9 @@ const router = express.Router();
 
 const jsonParser = bodyParser.json();
 
+const passport = require('passport');
+const jwtAuth = passport.authenticate('jwt', { session: false});
+
 // Post to register a new user
 router.post('/', jsonParser, (req, res) => {
   const requiredFields = ['username', 'password'];
@@ -134,6 +137,54 @@ router.post('/', jsonParser, (req, res) => {
       res.status(500).json({code: 500, message: 'Internal server error'});
     });
 });
+
+// User info update
+router.put('/:id', [jsonParser, jwtAuth], (req, res) => {
+ 
+  const updatableFields = ['firstName', 'lastName', 'phone', 'password', 'newPassword'];
+
+  const updatedUser = updatableFields.filter(field => field in req.body)
+               .reduce((acc, cur) => ({...acc, [cur]: req.body[cur]}), {});
+
+  if (req.params.id !== req.user.id || !updatedUser.password) {
+    return res.status(410).json({
+      reason: 'Unauthorized',
+      message: 'Different User or No Password'
+    });
+  }
+  
+  return User.findById(req.params.id)
+    .then(user => user.validatePassword(updatedUser.password))
+    .then(pass => {
+      if (!pass) {
+        return Promise.reject({
+          reason: 'IncorrectPassword',
+          message: 'Incorrect password'
+        });
+      }
+      delete updatedUser.password;   // remove password to prevent overwriting  
+
+      if (updatedUser.newPassword) {
+        return User.hashPassword(updatedUser.newPassword)
+            .then(hash => {
+              updatedUser.password = hash;
+              delete updatedUser.newPassword;
+            });
+      }      
+    })
+    .then(() => User.findByIdAndUpdate(req.params.id, 
+        {$set: updatedUser }, {new: true})
+      )
+    .then(user => res.status(203).json(user.serialize()))
+    .catch(err => {
+      if (err.reason === 'IncorrectPassword') {
+        return res.status(401).json(err);
+      }
+      res.status(500).json({code: 500, message: 'Internal server error'});
+    });
+   
+});
+
 
 // Never expose all your users like below in a prod application
 // we're just doing this so we have a quick way to see
