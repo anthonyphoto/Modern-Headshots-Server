@@ -18,7 +18,7 @@ const usersRouter = router;
 */
 const { router: usersRouter } = require('./users');  
 const { router: authRouter, localStrategy, jwtStrategy } = require('./auth');
-const { router: resRouter } = require('./resumes/router.js');  // Resume router
+const { router: eventRouter } = require('./events/router.js');  // Resume router
 
 mongoose.Promise = global.Promise;
 
@@ -46,7 +46,7 @@ passport.use(jwtStrategy);
 // app.use(express.static('public'));  // client repo is separate
 app.use('/api/users/', usersRouter);
 app.use('/api/auth/', authRouter);
-app.use('/resumes/', resRouter);
+app.use('/events/', eventRouter);
 
 const jwtAuth = passport.authenticate('jwt', { session: false });  
 
