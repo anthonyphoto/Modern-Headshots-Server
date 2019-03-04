@@ -53,8 +53,8 @@ router.get('/', (req, res)=>{  // No auth required
 
 });
 
+// serch event by event id
 router.get('/:id', [jwtAuth, userAuth], (req, res)=>{
-
     Event.findById(req.params.id)
     .then(event => {
         res.json(event);
@@ -66,21 +66,15 @@ router.get('/:id', [jwtAuth, userAuth], (req, res)=>{
 
 });
 
-router.get('/user/:username', (req, res)=>{
-    User.findOne({ username: req.params.username })
-    .then(user => {
-        Event.find({submitter: user._id}).sort('-created')
-        .then(event => {
-            res.json(event);
-        })
-        .catch(err => {
-            console.error(err);
-            res.status(500).json({ message: "Internal server error"});
-        });
+// search events by user id
+router.get('/user/:userid', [jwtAuth, userAuth], (req, res)=>{
+    Event.find({submitter: req.params.userid}).sort('-created')
+    .then(event => {
+        res.json(event);
     })
-    .catch(err=> {
+    .catch(err => {
         console.error(err);
-        res.status(500).json( { message: "Internal server error"});
+        res.status(500).json({ message: "Internal server error"});
     });
 });
 
@@ -168,7 +162,7 @@ router.put('/:id/status', [jsonParser, jwtAuth, userAuth], (req, res)=>{
     });
 });
 
-// To be used later
+// normal users are not allowed to delete events
 router.delete('/:id', [jwtAuth, adminAuth], (req, res)=>{
     Event.findByIdAndRemove(req.params.id)
     .then(event => res.status(204).end())

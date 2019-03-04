@@ -26,6 +26,16 @@ eventSchema.pre('find', function(next){
     next();
 });
 
+eventSchema.methods.serialize = function() {
+    return {
+        id: this._id,
+        sessionDate: this.sessionDate,
+        submitter: this.submitter._id,
+        firstName: this.submitter.firstName,
+        updated: this.updated
+    }
+};
+
 /*
 resumeSchema.virtual("role").get(function(){
     return `admin: ${this.submitter.admin}`;
