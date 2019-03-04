@@ -396,6 +396,7 @@ describe('/api/user', function () {
               'username',
               'firstName',
               'lastName',
+              'id',
               'phone',
               'admin'
             );
@@ -434,6 +435,7 @@ describe('/api/user', function () {
               'username',
               'firstName',
               'lastName',
+              'id',
               'phone',
               'admin'
             );
@@ -468,24 +470,28 @@ describe('/api/user', function () {
             firstName,
             lastName,
             admin
-          },
+          })
+          .then(()=> User.create( // separate promise to prevent race condition
           {
             username: usernameB,
             password: passwordB,
             firstName: firstNameB,
             lastName: lastNameB,
             admin
-          }
-        )
+          }))
           .then(() => chai.request(app).get('/api/users'))
           .then(res => {
             expect(res).to.have.status(200);
             expect(res.body).to.be.an('array');
             expect(res.body).to.have.length(2);
+            console.log('id', res.body[0].id);
+            expect(res.body[0].id).to.be.a('String');
+
             expect(res.body[0]).to.deep.equal({
               username,
               firstName,
               lastName,
+              id: res.body[0].id,
               phone: "",
               admin
             });
@@ -493,6 +499,7 @@ describe('/api/user', function () {
               username: usernameB,
               firstName: firstNameB,
               lastName: lastNameB,
+              id: res.body[1].id,
               phone: "",
               admin
             });

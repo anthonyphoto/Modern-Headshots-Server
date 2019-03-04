@@ -110,8 +110,9 @@ describe('Auth endpoints', function () {
           const payload = jwt.verify(token, JWT_SECRET, {
             algorithm: ['HS256']
           });
+          expect(payload.user.id).to.be.a('String');
+          delete payload.user.id;  
           expect(payload.user).to.deep.equal({
-            admin,
             username,
             firstName,
             lastName,
