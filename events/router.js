@@ -9,28 +9,57 @@ const jsonParser = bodyParser.json();
 
 const jwtAuth = passport.authenticate('jwt', { session: false});
 
-// Auth to check if subitter id is same as logged id
+// Auth to check if subitter id is same as logged id - 
+// parameter required userid or eventid
 function userAuth(req, res, next) {
-    Event.findById(req.params.id)
-    .then(event => {
-        if (!event) return res.status(404).end();
 
-        if ((!req.user.admin) && req.user.username !== event.submitter.username) {
-            throw {
+    /* handle if path parameter is a userid */
+    if (!req.params.userid && !req.params.id) {
+        return res.status(403).json({
+        code: 403,
+        reason: "NoPermission",
+        message: "No ID parameter passed"
+        });
+    }
+
+    console.log("req.user.id", req.user.id);
+    if (req.params.userid) {
+        if ((!req.user.admin) && req.user.id !== req.params.userid) {
+            return res.status(403).json({
                 code: 403,
                 reason: "NoPermission",
-                message: "Logged user is different from Submitter"
-            };
+                message: "Logged user is different from Submitter"            
+            });
         }
-        next();
-    })
-    .catch(err => {
-        console.error(err);
-        if (err.code) {
-            return res.status(err.code).json(err);
-        }
-        res.status(500).json({ message: "Internal server error"});
-    });   
+    }
+
+    /* handle if path parameter is an eventid */
+    if (req.params.id) {
+
+        Event.findById(req.params.id)
+            .then(event => {
+            // if (!event) return res.status(404).end();
+
+            if ((!req.user.admin) && req.user.username !== event.submitter.username) {
+                throw {
+                    code: 403,
+                    reason: "NoPermission",
+                    message: "Logged user is different from Submitter"
+                };
+            }
+            console.log(1234);
+            // next();
+        })
+        .catch(err => {
+            console.error(err);
+            if (err.code) {
+                return res.status(err.code).json(err);
+            }
+            res.status(500).json({ message: "Internal server error"});
+        });   
+
+    }
+    next();
 }
 
 function adminAuth(req, res, next) {
@@ -47,7 +76,27 @@ function adminAuth(req, res, next) {
 
 router.get('/', (req, res)=>{  // No auth required
 
-    return Event.find().sort('-created')
+    // const now = new Date();
+    let dt = new Date();
+    dt.setDate(new Date().getDate() + 1);
+    const tz = { timeZone: 'America/New_York' };
+    const year = dt.toLocaleString('en-US', {...tz, ...{year: "numeric"}});
+    const month = dt.toLocaleString('en-US', {...tz, ...{month: "2-digit"}});
+    const day = dt.toLocaleString('en-US', {...tz, ...{day: "2-digit"}});
+    const shortTZ = dt.toLocaleString('en-US', {...tz, ...{timeZoneName: "short"}}).slice(-3);
+    const startDate = new Date(`${month}/${day}/${year}, 4:00:00 ${shortTZ}`);
+
+
+    console.log("startDate:", startDate);
+
+    return Event.find(
+        {
+            sessionDate: {
+                $gte: startDate
+            }
+        }
+        ).sort('sessionDate')
+        // .then(events => res.status(499).json({ message: "test error" }))
         .then(events => res.status(200).json(events))
         .catch(err => res.status(500).json({ message: 'Internal server error'}));
 
@@ -56,6 +105,7 @@ router.get('/', (req, res)=>{  // No auth required
 // serch event by event id
 router.get('/:id', [jwtAuth, userAuth], (req, res)=>{
     Event.findById(req.params.id)
+                // .then(events => res.status(499).json({ message: "test error" }))
     .then(event => {
         res.json(event);
     })
@@ -68,7 +118,8 @@ router.get('/:id', [jwtAuth, userAuth], (req, res)=>{
 
 // search events by user id
 router.get('/user/:userid', [jwtAuth, userAuth], (req, res)=>{
-    Event.find({submitter: req.params.userid}).sort('-created')
+    Event.find({submitter: req.params.userid}).sort('sessionDate')
+            // .then(events => res.status(499).json({ message: "test error" }))
     .then(event => {
         res.json(event);
     })
@@ -77,6 +128,7 @@ router.get('/user/:userid', [jwtAuth, userAuth], (req, res)=>{
         res.status(500).json({ message: "Internal server error"});
     });
 });
+
 
 // Post a new event (Admin to set "available")
 router.post('/', [jsonParser, jwtAuth, adminAuth], (req, res)=>{
@@ -100,7 +152,7 @@ router.post('/', [jsonParser, jwtAuth, adminAuth], (req, res)=>{
 
 // Modify a event (User to book the event for any logged users) - userAuth not required
 router.put('/:id', [jsonParser, jwtAuth], (req, res)=>{
-    const { shootType, eventTitle, price, specialNote} = req.body;
+    const { shootType, eventTitle, eventPhone, price, specialNote} = req.body;
 
     Event.findById(req.params.id)
         .then(event=> {
@@ -114,7 +166,7 @@ router.put('/:id', [jsonParser, jwtAuth], (req, res)=>{
 
             return Event.findByIdAndUpdate(req.params.id, 
                 {$set: {
-                    shootType, eventTitle, price, specialNote,
+                    shootType, eventTitle, price, specialNote, eventPhone,
                     status: 'Booked',
                     submitter: req.user.id,
                     updated: Date.now()
@@ -149,7 +201,13 @@ router.put('/:id/status', [jsonParser, jwtAuth, userAuth], (req, res)=>{
             })
         }    
         return Event.findByIdAndUpdate(req.params.id, 
-                    { $set: { status }}, {new: true});
+                    { $set: {
+                        submitter: '5c7bf1b2936fd96128c2802b',
+                        status: 'Available',
+                        eventTitle: "",
+                        eventPhone: "",
+                        specialNote: ""
+                    }}, {new: true});
     })
     .then(event => res.status(203).json(event))
     .catch(err => {

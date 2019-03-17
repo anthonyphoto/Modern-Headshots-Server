@@ -10,6 +10,7 @@ const eventSchema = mongoose.Schema({
     eventTitle: String,
     price: Number,
     status: String,
+    eventPhone: {type: String, default: ''},
     updated: { type: Date, Default: Date.now },
     submitter: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
     photoLink: [String],
@@ -32,6 +33,7 @@ eventSchema.methods.serialize = function() {
         sessionDate: this.sessionDate,
         submitter: this.submitter._id,
         firstName: this.submitter.firstName,
+        eventPhone: this.eventPhone,
         updated: this.updated
     }
 };
