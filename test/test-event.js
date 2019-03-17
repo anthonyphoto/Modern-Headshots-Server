@@ -47,12 +47,14 @@ function createTestUser(){
 function generateEventData(id){
   // console.log('id in loop', id);
   return {
-    sessionDate: "2019-02-13T07:29:55.930Z",
+    sessionDate: new Date().setDate(new Date().getDate() + 2),  // get returns only future events
+    // new Date"2019-02-13T07:29:55.930Z",
     shootType: faker.random.words(),
     eventTitle: faker.random.words(),
     price: 50,
     status: "Available",
     submitter: id,
+    eventPhone: "123-456-7890",
     photoLink: [],
     specialNote: faker.random.words(),
     submitter: id,
@@ -100,6 +102,7 @@ describe("Event API Resource", function() {
                   expect(res).to.have.status(200);
                   expect(res).to.be.json;
                   expect(res.body).to.be.a('array');
+                  console.log("res.body", res.body);
                   expect(res.body).to.have.lengthOf.at.least(1);
                   return Event.count();
               })
