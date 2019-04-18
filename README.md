@@ -30,7 +30,7 @@ This is a photographer's web application with an online booking feature.  The us
 ### Technology Used
 * React/Redux
 * Node.js/Express
-* MongoDB/Gongoose
+* MongoDB/Mongoose
 * Mocha/Chai/Enzyme/Travis CI
 </br></br></br>
 
